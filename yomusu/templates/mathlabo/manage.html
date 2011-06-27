@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>数式画像作成ツールの管理ツール</title>
+</head>
+<body>
+	<h4>サマリー</h4>
+	<dl style="font-size:small">
+		<dt>全セッション数</dt><dd>{{ sama.count }}</dd>
+	</dl>
+	
+	<table border=1 style="font-size:small">
+		<tr><th>最終更新日</th><th>IP addr</th><th>UserAgent</th><th>数式</th><th>QR</th></tr>
+	{% for item in data %}
+		<tr>
+			<td>{{ item.date }}</td>
+			<td>{{ item.data.REMOTE_ADDR }}</td>
+			<td>{{ item.data.HTTP_USER_AGENT }}</td>
+			<td>{{ item.data.formula|escape }}</td>
+			<td>{{ item.data.qrcode|escape }}</td>
+		</tr>
+	{% endfor %}
+	</table>
+	
+</body>
+</html>

@@ -1,0 +1,77 @@
+div.div001 {
+	width: 600px;
+}
+
+div.div001 h4 {
+	margin: 1em 0 0 0;
+	padding: 0.3em 1em 0.3em 1em;
+	background: #D4EDC9;
+	font-size: small;
+	color: #000;
+}
+
+div.div001 P {
+	margin: 0 0 0 0;
+	padding: 0.5em 0.5em 0.5em 0.5em;
+	border: solid 1px #D4EDC9;
+}
+
+div.div001 form.fomula_form {
+	margin: 0 0 0 0;
+	padding: 0.5em 0.5em 0.5em 0.5em;
+	border: solid 1px #D4EDC9;
+	font-size: small;
+	color: #000;
+}
+
+
+div.div001 table {
+	margin: 0 0 0 0;
+	width: 100%;
+	border: solid 1px #D4EDC9;
+}
+
+div.div001 th {
+	margin: 0 0 0 0;
+	padding: 0.5em 0em 0.5em 0em;
+	background: #D4EDC9;
+	font-size: x-small;
+	color: #000;
+}
+
+div.div001 tr.odd {
+	background: #FFF;
+	font-size: 75%;
+	color: #000;
+}
+
+div.div001 tr.even {
+	background: #F7F7F7;
+	font-size: 75%;
+	color: #F000;
+}
+
+
+div.div001 td {
+  padding: 0.3em 0.5em 0.3em 0.5em;
+}
+
+
+div.div001 dl { 
+	margin:  0 0 0 0;
+	padding:  0.5em 0.5em 0.5em 0.5em;
+	font-size: small;
+	border: solid 1px #D4EDC9;
+}
+
+div.div001 dt {
+	font-style: normal;font-weight:bold;
+	margin:0px 0px 0px 0px;
+	padding: 0px 0px 0px 0px;
+}
+
+div.div001 dd {
+	border-width: 0;
+	margin:0 0 0 1em;
+	padding:0 0 0 0; 
+}

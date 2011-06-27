@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>QRコード作成ツール</title>
+	
+	<LINK rel="stylesheet" type="text/css" href="/css/math.css">
+	
+	<script language="JavaScript" src="/js/tool.js"></script>
+	
+	<script>
+	
+	/**************
+	 * 数式画像の更新
+	 */
+	function update_qrcode_image() {
+		
+		var f = document.qrform.text.value;
+		
+		var width = document.qrform.width.value;
+		var height= document.qrform.height.value;
+		
+		// 画像をセット
+		var url = "http://chart.apis.google.com/chart?chs="+width+"x"+height+"&cht=qr&chl=" + encodeURIComponent(f);
+		document.getElementById("qrcode_image").src = url;
+		
+		// 式のURLをセット
+		document.getElementById("qrcode_url").textContent = url;
+		
+		// 式のテキストをセット
+		document.getElementById("qrcode_text").textContent = f;
+	}
+	
+	/****************
+	 * 数式の保存
+	 */
+	function add_qrcode() {
+		var f = encodeURIComponent( document.qrform.text.value );
+		postxml("/mathlabo/qr/add", "qrcode="+f, function(response) { read_qrcodes() } );
+	}
+	
+	/***************************************
+	 *
+	 * 保存している数式データを読み込む
+	 *
+	 */
+	function read_qrcodes() {
+		
+		readxml("/mathlabo/qr/get", "", function(response) {
+			// 読み込み完了時の処理
+			var html = "<tr><th width='3em'>No.</th><th>内容</th><th width='4em'></th><th width='4em'></th>"
+			var r = JSON.parse(response.responseText)
+			if( r.result ) {
+				var	j = r.data
+				for (i = 0; i < j.length; i++) {
+					var	id = "f"+i;
+					var	e = html_escape(j[i]);
+					html += "<tr class='"+((i % 2)==0?"odd":"even")+"''>"
+					html += "<td>" + i + "</td>"
+					html += "<td id='"+id+"'>" + e + "</td>"
+					html += "<td><form><input type='button' value='採用' onclick='put_qrcode(\""+id+"\")'></form></td>"
+					html += "<td><form><input type='button' value='削除' onclick='del_qrcode(\""+i+"\")'></form></td>"
+					html += "</tr>"
+				}
+				document.getElementById('DATA').innerHTML = "<table>"+html+"</table>";
+			} else {
+				document.getElementById('DATA').innerHTML = "データがありません";
+			}
+		})
+	}
+	
+	/** 保存数式の追加 */
+	function put_qrcode( id ) {
+		var	f = document.getElementById(id).innerHTML;
+		document.qrform.text.value = f.toString();
+		update_math_image()
+	}
+	
+	/** 保存数式の削除 */
+	function del_qrcode( i ) {
+		readxml("/mathlabo/qr/del", "index="+i, function(response) { read_qrcodes() } )
+	}
+	
+	
+	attachOnLoadEvent( read_qrcodes );
+
+</script>
+	
+</head>
+<body>
+	<div class="div001">
+	<h4>Google Chart：QRコード</h4>
+	<p><img id="qrcode_image" src="http://chart.apis.google.com/chart?chs=100x100&cht=qr&chl=notext" ></p>
+	<h4>画像情報</h4>
+	<dl>
+		<dt>URL</dt><dd><code><div id="qrcode_url">no text</div></code></dd>
+		<dt>内容</dt><dd><code><div id="qrcode_text">no text</div></code></dd>
+	</dl>
+	
+	<h4>内容編集</h4>
+	<form action="#" name="qrform" class="qrcode_form">
+		<div>URL等QRコードにいれたい内容(1024文字まで)</div>
+		<textarea id="text" cols="60" rows="4" maxlength="1024"></textarea><br>
+		幅<input id="width" type="number" autocomplete=on min="100" max="500" step="50" value="100"> x 
+		高さ<input id="height" type="number" autocomplete=on min="100" max="500" step="50" value="100"><br>
+		<input type="button" value="画像にしてみる" onclick="update_qrcode_image()"><br>
+		<input type="button" value="My履歴に追加してみる" onclick="add_qrcode()">
+	</form>
+	
+	<h4>My履歴(最大10件)</h4>
+	<div name="DATA" id="DATA" >
+		<table>	<tr><td>読み込み中…</td></tr></table>
+	</div>
+	
+</body>
+</html>

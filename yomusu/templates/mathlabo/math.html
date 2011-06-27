@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>数式画像作成ツール</title>
+	
+	<LINK rel="stylesheet" type="text/css" href="/css/math.css">
+	
+	<script language="JavaScript" src="/js/tool.js"></script>
+	
+	<script>
+	
+	/**************
+	 * 数式画像の更新
+	 */
+	function update_math_image() {
+		
+		var f = document.formula_form.F.value;
+		
+		// 画像をセット
+		var url = "https://chart.googleapis.com/chart?cht=tx&chl=" + encodeURIComponent(f);
+		document.getElementById("math_image").src = url;
+		
+		// 式のURLをセット
+		document.getElementById("math_url").textContent = url;
+		
+		// 式のテキストをセット
+		document.getElementById("math_text").textContent = f;
+	}
+	
+	/****************
+	 * 数式の保存
+	 */
+	function add_math_formula() {
+		var f = encodeURIComponent( document.formula_form.F.value );
+		postxml("/mathlabo/add", "formula="+f, function(response) { read_formula() } );
+	}
+	
+	/***************************************
+	 *
+	 * 保存している数式データを読み込む
+	 *
+	 */
+	function read_formula() {
+		
+		readxml("/mathlabo/get", "", function(response) {
+			// 読み込み完了時の処理
+			var html = "<tr><th width='3em'>No.</th><th>数式</th><th width='4em'></th><th width='4em'></th>"
+			var r = JSON.parse(response.responseText)
+			if( r.result ) {
+				var	j = r.data
+				for (i = 0; i < j.length; i++) {
+					var	id = "f"+i;
+					var	e = html_escape(j[i]);
+					html += "<tr class='"+((i % 2)==0?"odd":"even")+"''>"
+					html += "<td>" + i + "</td>"
+					html += "<td id='"+id+"'>" + e + "</td>"
+					html += "<td><form><input type='button' value='採用' onclick='put_formula(\""+id+"\")'></form></td>"
+					html += "<td><form><input type='button' value='削除' onclick='del_formula(\""+i+"\")'></form></td>"
+					html += "</tr>"
+				}
+				document.getElementById('DATA').innerHTML = "<table>"+html+"</table>";
+			} else {
+				document.getElementById('DATA').innerHTML = "データがありません";
+			}
+		})
+	}
+	
+	/** 保存数式の追加 */
+	function put_formula( id ) {
+		var	f = document.getElementById(id).innerHTML;
+		document.getElementById("F").value = f.toString();
+		update_math_image()
+	}
+	
+	/** 保存数式の削除 */
+	function del_formula( i ) {
+		readxml("/mathlabo/del", "index="+i, function(response) { read_formula() } )
+	}
+	
+	/** cookieを削除する */
+	function dispose_cookie() {
+		postxml("/mathlabo/dispose", "", function(response) { read_formula() } )
+	}
+	
+	
+	attachOnLoadEvent( read_formula );
+
+</script>
+	
+</head>
+<body>
+	<div class="div001">
+	<h4>Google Chart画像</h4>
+	<p><img id="math_image" src="https://chart.googleapis.com/chart?cht=tx&chl=nofunc" ></p>
+	<h4>画像情報</h4>
+	<dl>
+		<dt>URL</dt><dd><code><div id="math_url">no func</div></code></dd>
+		<dt>式テキスト</dt><dd><code><div id="math_text">no func</div></code></dd>
+	</dl>
+	
+	<h4>数式の編集</h4>
+	<form action="#" name="formula_form" class="formula_form">
+		<div>数式(1024文字まで)</div>
+		<textarea id="F" cols="60" rows="4" maxlength="1024"></textarea><br>
+		<input type="button" value="画像にしてみる" onclick="update_math_image()"><br>
+		<input type="button" value="My履歴に追加してみる" onclick="add_math_formula()">
+	</form>
+	
+	<h4>My履歴(最大10件)</h4>
+	<div name="DATA" id="DATA" >
+		<table>	<tr><td>読み込み中…</td></tr></table>
+	</div>
+	
+	<form action="#" name="update_formula">
+		<input type="button" value="記録を全抹消" onclick="dispose_cookie()">
+	</form>
+	</div>
+</body>
+</html>
